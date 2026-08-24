@@ -58,6 +58,16 @@ select:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
+<div id="lockScreen" style="position:fixed; inset:0; background:#FAFAF9; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#FFFFFF; border:1px solid #E4E4E1; border-radius:10px; padding:36px 28px; max-width:340px; width:100%; box-shadow:0 4px 14px rgba(0,0,0,0.06); text-align:center;">
+    <p style="font-family:'Barlow Condensed', sans-serif; font-size:1.15rem; font-weight:700; color:#24262B; margin-bottom:6px;">パスワードを入力してください</p>
+    <p style="font-size:0.75rem; color:#8A8D93; margin-bottom:20px;">社内限定ツールです</p>
+    <input id="lockPassInput" type="password" placeholder="パスワード" style="width:100%; padding:12px 14px; border:1px solid #E4E4E1; border-radius:4px; font-size:0.95rem; margin-bottom:12px; font-family:'Noto Sans JP', sans-serif; box-sizing:border-box;">
+    <button id="lockPassBtn" style="width:100%; padding:12px; background:#2B2F36; color:#fff; border:none; border-radius:4px; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:'Noto Sans JP', sans-serif;">入る</button>
+    <p id="lockPassError" style="font-size:0.78rem; color:#B3261E; margin-top:12px; display:none;">パスワードが違います</p>
+  </div>
+</div>
+<div id="mainContent" style="display:none;">
 <header>
   <p>輸入車ワイパーブレード 適合検索</p>
 </header>
@@ -211,6 +221,41 @@ function renderResults(results, containerId) {
   });
   container.innerHTML = html;
 }
+</script>
+</div>
+<script>
+(function() {
+  var PASSWORD = "Nor3357";
+  var lockScreen = document.getElementById('lockScreen');
+  var mainContent = document.getElementById('mainContent');
+  var input = document.getElementById('lockPassInput');
+  var btn = document.getElementById('lockPassBtn');
+  var errorMsg = document.getElementById('lockPassError');
+
+  function tryUnlock() {
+    if (input.value === PASSWORD) {
+      lockScreen.style.display = 'none';
+      mainContent.style.display = 'block';
+      try { sessionStorage.setItem('unlocked_boschtool', '1'); } catch (e) {}
+    } else {
+      errorMsg.style.display = 'block';
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') tryUnlock();
+  });
+
+  try {
+    if (sessionStorage.getItem('unlocked_boschtool') === '1') {
+      lockScreen.style.display = 'none';
+      mainContent.style.display = 'block';
+    }
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>
